@@ -69,7 +69,7 @@ def load_files(directory):
 def tokenize(document):
     """
     Given a document (represented as a string), return a list of all of the
-    words in that document, in order.
+    words in that document, in order. ######## what mean >in order<
 
     Process document by coverting all words to lowercase, and removing any
     punctuation or English stopwords.
@@ -85,17 +85,8 @@ def tokenize(document):
             if word not in stop_words:
                 filtered.append(word)
     # print(len(filtered))
-
-    # filtered_sentence = [w for w in words_second if not w.lower() in stop_words]
     # OR
-    # # Extract words
-    #             contents = [
-    #                 word.lower() for word in
-    #                 nltk.word_tokenize(f.read())
-    #                 if word.isalpha() # probably not this -> The isalpha() methods returns “True” if all characters in the string are alphabets, Otherwise, It returns “False”. This function is used to check if the argument includes only alphabet characters (mentioned below).
-    #               probably this - > if word not in string.punctuation: AND if word not in stop_words:
-    #             ]
-
+    # filtered_sentence = [w for w in words_second if not w.lower() in stop_words]
     # print(filtered)  # have: '====' "'s" "''", 'blah', '``' ................ ?
 
     return filtered
@@ -133,20 +124,18 @@ def top_files(query, files, idfs, n):
     to their IDF values), return a list of the filenames of the the `n` top
     files that match the query, ranked according to tf-idf.
     """
-
+    # checking if query words in idfs
     query_words = [word.lower() for word in query
                    if word in idfs.keys()
                    ]
-    print(query_words)
 
     # Calculate TF-IDFs
     print("Calculating term frequencies...")
     tfidfs = dict()
     # Add keys in dict -> DICT={FILENAME:{QUERY_WORD:HOW_MANY_TIMES_IN FILENAME}}
     for filename in files:
-        tfidfs[filename]=dict()
+        tfidfs[filename] = dict()
         for word in query_words:
-            #print(filename, word)
             tfidfs[filename][word] = 0
 
     # COUNTING
@@ -160,20 +149,19 @@ def top_files(query, files, idfs, n):
         for word in query_words:
             tfidfs[filename][word] *= idfs[word]
 
-
-    sum_dict=dict()
+    sum_dict = dict()
     for key in files:
-        sum_dict[key]=0
+        sum_dict[key] = 0
         for word in query_words:
-            sum_dict[key] += tfidfs[key][query_word]
+            sum_dict[key] += tfidfs[key][word]
 
-    sum_dict=dict(sorted(sum_dict.items(), key=lambda x: x[1], reverse=True))
+    sum_dict = dict(sorted(sum_dict.items(), key=lambda x: x[1], reverse=True))
 
-    return_list=[]
+    return_list = []
     for i in range(n):
         return_list.append(list(sum_dict.keys())[i])
+
     return return_list
-    #raise NotImplementedError
 
 
 def top_sentences(query, sentences, idfs, n):
@@ -184,27 +172,30 @@ def top_sentences(query, sentences, idfs, n):
     the query, ranked according to idf. If there are ties, preference should
     be given to sentences that have a higher query term density.
     """
-    for word in query:
-        print(word, " -> " , idfs[word])
+    #for word in query:
+    #    print(word, " -> " , idfs[word])
 
-    sentences_values=dict()
+    sentences_values = dict()
+
     for sentence in sentences:
         value = 0
-        for word in query:
-            if word in sentences[sentence]:
-        #for word in sentences[sentence]:
-        #    if word in query:
+        for word in query:  # for every query word
+            if word in sentences[sentence]:  # if query word in sentence (ONLY ONCE IS COUNT???????)
                 value += idfs[word]
         sentences_values[sentence] = value
 
     sum_dict = dict(sorted(sentences_values.items(), key=lambda x: x[1], reverse=True))
 
-    # jeśli remis
-    print(list(sum_dict.values())[0])
-    print(list(sum_dict.values())[1])
-    print(list(sum_dict.values())[2])
+    set_of_values_to_return_plus_one ={}
+    for i in range(n+1):
+        set_of_values_to_return_plus_one.add(list(sum_dict.values())[i])
+    if len(set_of_values_to_return_plus_one) != n+1:
+        # If two sentences have the same value
+        pass
+        
+
     return_list = []
-    for i in range(n):
+    for i in range(n+1):
         return_list.append(list(sum_dict.keys())[i])
 
     return return_list
