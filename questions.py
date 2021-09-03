@@ -184,6 +184,7 @@ def top_sentences(query, sentences, idfs, n):
                 value += idfs[word]
         sentences_values[sentence] = value
 
+<<<<<<< HEAD
     sentences_values = dict(sorted(sentences_values.items(), key=lambda x: x[1], reverse=True))
 
     set_of_values_to_return_plus_one = set()
@@ -203,6 +204,20 @@ def top_sentences(query, sentences, idfs, n):
 
     return_list = []
     for i in range(n):
+=======
+    sum_dict = dict(sorted(sentences_values.items(), key=lambda x: x[1], reverse=True))
+
+    set_of_values_to_return_plus_one ={}
+    for i in range(n+1):
+        set_of_values_to_return_plus_one.add(list(sum_dict.values())[i])
+    if len(set_of_values_to_return_plus_one) != n+1:
+        # If two sentences have the same value
+        pass
+        
+
+    return_list = []
+    for i in range(n+1):
+>>>>>>> e84a6a76b32c64df8050bd500f6c9356cbbecfbe
         return_list.append(list(sum_dict.keys())[i])
 
     return return_list
