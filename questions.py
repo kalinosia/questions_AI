@@ -84,10 +84,6 @@ def tokenize(document):
         if word not in string.punctuation:
             if word not in stop_words:
                 filtered.append(word)
-    # print(len(filtered))
-    # OR
-    # filtered_sentence = [w for w in words_second if not w.lower() in stop_words]
-    # print(filtered)  # have: '====' "'s" "''", 'blah', '``' ................ ?
 
     return filtered
 
@@ -113,7 +109,6 @@ def compute_idfs(documents):
         idf = math.log(len(documents) / f)
         idfs[word] = idf
 
-    # print(len(idfs))
     return idfs
 
 
@@ -129,8 +124,7 @@ def top_files(query, files, idfs, n):
                    if word in idfs.keys()
                    ]
 
-    # Calculate TF-IDFs
-    print("Calculating term frequencies...")
+    #print("Calculating term frequencies...")
     tfidfs = dict()
     # Add keys in dict -> DICT={FILENAME:{QUERY_WORD:HOW_MANY_TIMES_IN FILENAME}}
     for filename in files:
@@ -172,43 +166,24 @@ def top_sentences(query, sentences, idfs, n):
     the query, ranked according to idf. If there are ties, preference should
     be given to sentences that have a higher query term density.
     """
-    #for word in query:
-    #    print(word, " -> " , idfs[word])
 
     sentences_values = dict()
 
     for sentence in sentences:
-        value = 0
-        for word in query:  # for every query word
-            if word in sentences[sentence]:  # if query word in sentence (ONLY ONCE IS COUNT???????)
-                value += idfs[word]
-        sentences_values[sentence] = value
+        value = sum(idfs[word]
+                    for word in query
+                    if word in sentences[sentence])
 
+        sentences_values[sentence] = [value,
+                                      (sum(word in sentences[sentence] for word in query)/len(sentences[sentence]))]
 
-    sentences_values = dict(sorted(sentences_values.items(), key=lambda x: x[1], reverse=True))
-
-    set_of_values_to_return_plus_one = set()
-    for i in range(n+1):
-        set_of_values_to_return_plus_one.add(list(sentences_values.values())[i])
-    if len(set_of_values_to_return_plus_one) != n+1:
-        # If two sentences have the same value
-        for sentence in sentences:
-            value = sentences_values[sentence]
-            sentences_values[sentence] = [
-                value,
-                (sum(word in sentences[sentence] for word in query)/len(sentences[sentence]))
-            ]
-    print(sentences_values)
-    sum_dict = dict(sorted(sentences_values.items(), key=lambda x: (-x[1][0],-x[1][1])))
-    print(sum_dict.values())
+    sentences_values_sorted = dict(sorted(sentences_values.items(), key=lambda x: (-x[1][0], -x[1][1])))
 
     return_list = []
     for i in range(n):
-        return_list.append(list(sum_dict.keys())[i])
+        return_list.append(list(sentences_values_sorted.keys())[i])
 
     return return_list
-
-    #raise NotImplementedError
 
 
 if __name__ == "__main__":
